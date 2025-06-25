@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailwind-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tailwind-app
+  template:
+    metadata:
+      labels:
+        app: tailwind-app
+    spec:
+      containers:
+      - name: tailwind-app
+        image: uthrapathyofc/tailwind-site:1
+        ports:
+        - containerPort: 3000
