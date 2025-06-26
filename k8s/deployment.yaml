@@ -17,3 +17,4 @@ spec:
         image: uthrapathyofc/tailwind-site:1
         ports:
         - containerPort: 3000
+          hostPort: 30080
