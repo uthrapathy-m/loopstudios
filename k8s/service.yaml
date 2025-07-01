@@ -3,11 +3,10 @@ kind: Service
 metadata:
   name: tailwind-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: tailwind-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 3000
-      nodePort: 30080
