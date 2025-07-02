@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: tailwind-app
-        image: uthrapathyofc/tailwind-site:1
+        image: uthrapathym/tailwind-site:1
         ports:
         - containerPort: 3000
           hostPort: 30080
