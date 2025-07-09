@@ -1,0 +1,69 @@
+pipeline {
+  agent any
+
+  environment {
+    IMAGE = "uthrapathyofc/tailwind-site"
+    TAG = "1"
+  }
+
+  tools {
+    nodejs 'node22'
+  }
+
+  stages {
+    stage('Clone') {
+      steps {
+        git branch: 'main', url: 'https://github.com/uthrapathy-m/loopstudios.git'
+      }
+    }
+
+    stage('Install & Build Tailwind') {
+      steps {
+        sh 'npm install'
+        sh 'npm run watch'
+      }
+    }
+
+    stage('Docker Build') {
+      steps {
+        sh "docker build -t $IMAGE:$TAG ."
+      }
+    }
+
+     stage('Docker Push') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh '''
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push uthrapathyofc/tailwind-site:1
+          '''
+        }
+      }
+    }
+
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
+          sh 'kubectl apply -f k8s/deployment.yaml'
+          sh 'kubectl apply -f k8s/service.yaml'
+        }
+      }
+    }
+
+
+    stage('Endpoints') {
+      steps {
+        withEnv(["MINIKUBE_HOME=/var/lib/jenkins/.minikube", "KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
+          sh '''
+            if minikube status | grep -q "host: Running"; then
+              minikube service tailwind-service --url
+            else
+              echo "⚠️ Minikube is not running — skipping service URL."
+            fi
+          '''
+        }
+      }
+    }
+  }
+}

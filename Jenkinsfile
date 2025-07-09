@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('Clone') {
       steps {
-        git 'https://github.com/uthrapathy-m/loopstudios.git'
+       git branch: 'main', url: 'https://github.com/uthrapathy-m/loopstudios.git'
       }
     }
 
@@ -43,6 +43,7 @@ pipeline {
       steps {
         sh 'kubectl apply -f k8s/deployment.yaml'
         sh 'kubectl apply -f k8s/service.yaml'
+        sleep 40
       }
     }
 
